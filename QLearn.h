@@ -30,7 +30,7 @@
 #define lambda .5			// Discount rate for future rewards
 #define max_graph_size 32*32
 
-#define numFeatures 5			// UPDATE THIS to be the number of features you have
+#define numFeatures 4			// UPDATE THIS to be the number of features you have
 
 #define MIN -1000000
 #define MAX 1000000
@@ -71,10 +71,10 @@ int inline index_to_y_cooridinate(int index, int size_X) {
 
 int get_random_action(double gr[max_graph_size][4], int i, int j, int size_X);
 int get_neighbour_index(int current_index, int neighbour_adj_index, int size_X);
-int all_visited(int distances[5]);
 int in_dst_pos(int index, int dst_pos[5][2], int size_X);
-void BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], double distances[5], int size_X, int graph_size);
+int BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], double distances[5], int num, int depth, int size_X, int graph_size);
 void Manhatten_distance(int mouse_pos[1][2], int dst_pos[5][2], double distances[5]);
-void calculate_average_closest_distance(double distances[5], double *d_closest, double *d_average);
+void calculate_average_closest_distance(double distances[5], int *closest_index, double *d_closest, double *d_average);
+int count_wall(double gr[max_graph_size][4], int pos[2], int size_X);
 #endif
 

@@ -335,8 +335,8 @@ double QLearn_reward(double gr[max_graph_size][4], int mouse_pos[1][2], int cats
   double distances_bw_mouse_cats[5] = {-1, -1, -1, -1, -1};
   double distances_bw_mouse_cheeses[5] = {-1, -1, -1, -1, -1};
 
-  BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, size_X, graph_size);
-  BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, size_X, graph_size);
+  BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, 1, size_X, size_X, graph_size);
+  BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, 1, size_X, size_X, graph_size);
 
   double d_cat = distances_bw_mouse_cats[0];
   double d_cheese = distances_bw_mouse_cheeses[0];
@@ -362,14 +362,8 @@ double QLearn_reward(double gr[max_graph_size][4], int mouse_pos[1][2], int cats
     }
 
     // computer number of walls around mouse
-    int num_of_walls = 0;
     int mouse_index = cooridinates_to_index(mouse_pos[0][0], mouse_pos[0][1], size_X);
-    
-    for (int i = 0; i < 4; i++) {
-      if (gr[mouse_index][i] == 0) {
-        num_of_walls++;
-      }
-    }
+    int num_of_walls = count_wall(gr, mouse_pos[0], size_X);
 
     // only has one way out
     if (num_of_walls == 3) {
@@ -482,23 +476,77 @@ void evaluateFeatures(double gr[max_graph_size][4],double features[25], int mous
    /***********************************************************************************************
    * TO DO: Complete this function
    ***********************************************************************************************/      
+  
+  int numberOfCheese = 0;
+  int numberOfCats = 0;
+
+  // checking coordinates to see total number of cheese/cats
+  for (int x = 0; x < 5; x++) {
+    //only need to check one coordinate
+    if (cats[x][0] != -1) {
+      numberOfCats++;
+    }
+    if (cheeses[x][0] != -1) {
+      numberOfCheese++;
+    }
+  }
 
   double distances_bw_mouse_cats[5] = {-1, -1, -1, -1, -1};
   double distances_bw_mouse_cheeses[5] = {-1, -1, -1, -1, -1};
+  int max_depth = graph_size + 1;
 
-  BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, size_X, graph_size);
-  BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, size_X, graph_size);
-
-  // Manhatten_distance(mouse_pos, cats, distances_bw_mouse_cats);
-  // Manhatten_distance(mouse_pos, cheeses, distances_bw_mouse_cheeses);
+  double cat_reach_max_depth = BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, numberOfCheese, max_depth, size_X, graph_size);
+  double cheese_reach_max_depth = BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, numberOfCheese, max_depth, size_X, graph_size);
 
   double d_cat_closest = MAX;
   double d_cheese_closest = MAX;
+  int cat_closest_index = -1;
+  int cheese_closest_index = -1;
   double d_cat_average = 0;
   double d_cheese_average = 0;
 
-  calculate_average_closest_distance(distances_bw_mouse_cats, &d_cat_closest, &d_cat_average);
-  calculate_average_closest_distance(distances_bw_mouse_cheeses, &d_cheese_closest, &d_cheese_average);
+  if (!cat_reach_max_depth)
+  {
+    calculate_average_closest_distance(distances_bw_mouse_cats, &cat_closest_index, &d_cat_closest, &d_cat_average);
+  }
+  else
+  {
+    Manhatten_distance(mouse_pos, cats, distances_bw_mouse_cats);
+    calculate_average_closest_distance(distances_bw_mouse_cats, &cat_closest_index, &d_cat_closest, &d_cat_average);
+    if (d_cat_closest < max_depth)
+    {
+      d_cat_closest = max_depth;
+    }
+  }
+  if (!cheese_reach_max_depth)
+  {
+    calculate_average_closest_distance(distances_bw_mouse_cheeses, &cheese_closest_index, &d_cheese_closest, &d_cheese_average);
+  }
+  else
+  {
+    Manhatten_distance(mouse_pos, cheeses, distances_bw_mouse_cheeses);
+    calculate_average_closest_distance(distances_bw_mouse_cheeses, &cheese_closest_index, &d_cheese_closest, &d_cheese_average);
+    if (d_cheese_closest < max_depth)
+    {
+      d_cheese_closest = max_depth;
+    }
+  }
+
+  int num_of_walls = count_wall(gr, cheeses[cheese_closest_index], size_X);
+
+  features[0] = 1 / (d_cheese_closest + 1);
+  features[1] = - 1 / (d_cat_closest + 1);
+  // if (num_of_walls == 3 && numberOfCheese == 1) {
+  //   features[2] = size_X;
+  // } else if (num_of_walls == 3) {
+  //   features[2] = size_X / 3;
+  // }
+  // else
+  // {
+  //   features[2] = size_X / (num_of_walls + 1);
+  // }
+
+  features[2] = d_cat_average;
 }
 
 double Qsa(double weights[25], double features[25])
@@ -593,22 +641,6 @@ void maxQsa(double gr[max_graph_size][4],double weights[25],int mouse_pos[1][2],
  *                 ---->  THIS BOX <-----
  * *************************************************************************************************/
 
-int all_visited(int distances[5])
-{
-  int output = 1;
-
-  for (int i = 0; i < 5; i++)
-  {
-    if (distances[i] == -1)
-    {
-      output = 0;
-      break;
-    }
-  }
-
-  return output;
-}
-
 int in_dst_pos(int index, int dst_pos[5][2], int size_X)
 {
   int output = -1;
@@ -623,16 +655,19 @@ int in_dst_pos(int index, int dst_pos[5][2], int size_X)
   return output;
 }
 
-void BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], double distances[5], int size_X, int graph_size)
+int BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], double distances[5], int num, int depth, int size_X, int graph_size)
 {
   int start_node_index = cooridinates_to_index(mouse_pos[0][0], mouse_pos[0][1], size_X);
   int is_in_dst_pos = -1;
+  int found = 0;
+  int cur_depth = 0;
 
   // check mouse pos
   is_in_dst_pos = in_dst_pos(start_node_index, dst_pos, size_X);
   if (is_in_dst_pos > -1)
   {
     distances[is_in_dst_pos] = 0;
+    found++;
   }
 
   // initilaize priority queue (graph index, cost) with start location
@@ -644,8 +679,20 @@ void BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], d
   visited[start_node_index] = 1;
 
   // while priorirty queue is not empty or not every dst_pos has been visited
-	while (!is_empty(&priority_queue) || !all_visited)
+	while (!is_empty(&priority_queue))
   {
+    cur_depth++;
+
+    if (found == num)
+    {
+      break;
+    }
+
+    if (cur_depth == depth)
+    {
+      return 1;
+    }
+
     // lowest cost node
 		int current_lowest_node_index = peek(&priority_queue);
 		int current_lowest_node_priority = peek_priority(&priority_queue);
@@ -665,6 +712,7 @@ void BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], d
           if (is_in_dst_pos > -1)
           {
             distances[is_in_dst_pos] = current_lowest_node_priority + 1;
+            found++;
           }
         }
       }
@@ -675,6 +723,8 @@ void BFS(double gr[max_graph_size][4], int mouse_pos[1][2], int dst_pos[5][2], d
 	while (!is_empty(&priority_queue)) {
 		pop(&priority_queue); 
 	}
+
+  return 0;
 }
 
 void Manhatten_distance(int mouse_pos[1][2], int dst_pos[5][2], double distances[5])
@@ -685,25 +735,41 @@ void Manhatten_distance(int mouse_pos[1][2], int dst_pos[5][2], double distances
   }
 }
 
-void calculate_average_closest_distance(double distances[5], double *d_closest, double *d_average)
+void calculate_average_closest_distance(double distances[5], int *closest_index, double *d_closest, double *d_average)
 {
   double cur_d_closest = MAX;
   double cur_d_average = 0;
+  int cur_index_closest = -1;
   int num = 0;
 
   for (int i = 0; i < 5; i++)
   {
     if (distances[i] > -1)
     {
-      // fprintf(stdout, "my distance %f, i=%d\n", distances[i], i);
       num++;
       cur_d_average += distances[i];
       if (distances[i] < cur_d_closest)
       {
         cur_d_closest = distances[i];
+        cur_index_closest = i;
       }
     }
   }
   *d_average = cur_d_average / (double) num;
   *d_closest = cur_d_closest;
+  *closest_index = cur_index_closest;
+}
+
+int count_wall(double gr[max_graph_size][4], int pos[2], int size_X)
+{
+  int num = 0;
+  int index = pos[0] + (pos[1] * size_X);
+
+  for (int i = 0; i < 4; i++) {
+    if (gr[index][i] == 0) {
+      num++;
+    }
+  }
+
+  return num;
 }
