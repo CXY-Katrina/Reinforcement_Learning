@@ -10,15 +10,15 @@ mark.
 
 ________________________________________________
 
-Student Name 1 (last, first):
+Student Name 1 (last, first): Chen, Xin Yi
 
 Student Name 2 (last, first):
 
-Student number 1:
+Student number 1: 1004705018
 
 Student number 2:
 
-UTORid 1:
+UTORid 1: chenx425
 
 UTORid 2:
 
@@ -28,7 +28,7 @@ READ THIS AND SIGN YOUR NAME AT THE END:
 honesty and plaguarism. All work submitted as part
 of this assignment is my own.
 
-	Signed: _(student 1 name here)__	_(student 2 name here)__
+	Signed: _Xin Yi Chen__	_(student 2 name here)__
 
 
 (-5 marks for failing to provide the identifying
@@ -41,6 +41,15 @@ but explain carefully when needed.
 1 .- (1 mark) Explain your reward function. What game elements
       are used, and why you think this is a good reward function
       for this problem.
+
+      a) The distance between mouse and cheese
+          The shorter the distance is, the larger the reward is.
+          This factor strongly impact the reward.
+      b) The difference between the distance from mouse to cat and the distance from mouse to cheese.
+          If the cat is closer to the mouse, decrease the reward.
+          If the mouse is closer to the cheese, increase the reward.
+      c) The number of walls around the mouse
+          If the number of walls is 3, significantly decrease the reward.
 
 2 .- These are multiple experiments (once you are sure your 
      QLearning code is working!) 
@@ -105,6 +114,16 @@ but explain carefully when needed.
 7 .- (3 marks) Explain your feature set for feature-based Q Learning, and
                explain why and how each feature is expected to contribute
 	       to helping your mouse win
+     Feature 1 - The distance between the mouse and the closest cheese
+          The shorter the distance is, the larger the reward is.
+     Feture 2 - The distance between the mouse and the closest cat
+          The shorter the distance is, the smaller the reward is.
+     We also consider to add features that take into account:
+          a) The difference between the average distance from mouse to cats 
+          and the average distance from mouse to cheeses
+          b) The number of walls around mouse
+          c) The number of walls around the closest cheeses
+     However, none of them contribute to the final success rate.
 
 8 .- Carry out the following experiments:
 
@@ -143,7 +162,7 @@ but explain carefully when needed.
      # the 16x16 grid, 2 cats, and 3 cheeses, cat-smartness=.9,  
      # random seed = 1522, and use 1000000 trials and 50 rounds. 
 
-     Initial mouse winning rate (first rate obtained when training starts):
+     Initial mouse winning rate (first rate obtained when training starts): 8%
      
      Mouse Winning Rate (from evaluation after training):
   

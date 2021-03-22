@@ -185,9 +185,6 @@ int get_random_action(double gr[max_graph_size][4], int i, int j, int size_X)
   {
     if (random_number < (double) v / (double) number_of_valid_actions)
     {
-      // fprintf(stdout, "random=%f\n", random_number);
-      // fprintf(stdout, "v=%d\n", v);
-      // fprintf(stdout, "number_of_valid_actions=%d\n", number_of_valid_actions);
       a = valid_actions[v - 1];
       break;
     }
@@ -476,17 +473,15 @@ void evaluateFeatures(double gr[max_graph_size][4],double features[25], int mous
    * TO DO: Complete this function
    ***********************************************************************************************/      
   
-  int numberOfCheese = 0;
-  int numberOfCats = 0;
+  int num_of_cheeses = 0;
+  int num_of_cats = 0;
 
-  // checking coordinates to see total number of cheese/cats
-  for (int x = 0; x < 5; x++) {
-    //only need to check one coordinate
-    if (cats[x][0] != -1) {
-      numberOfCats++;
+  for (int i = 0; i < 5; i++) {
+    if (cats[i][0] != -1) {
+      num_of_cats++;
     }
-    if (cheeses[x][0] != -1) {
-      numberOfCheese++;
+    if (cheeses[i][0] != -1) {
+      num_of_cheeses++;
     }
   }
 
@@ -494,8 +489,8 @@ void evaluateFeatures(double gr[max_graph_size][4],double features[25], int mous
   double distances_bw_mouse_cheeses[5] = {-1, -1, -1, -1, -1};
   int max_depth = graph_size + 1;
 
-  double cat_reach_max_depth = BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, numberOfCheese, max_depth, size_X, graph_size);
-  double cheese_reach_max_depth = BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, numberOfCheese, max_depth, size_X, graph_size);
+  double cat_reach_max_depth = BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, num_of_cats, max_depth, size_X, graph_size);
+  double cheese_reach_max_depth = BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, num_of_cheeses, max_depth, size_X, graph_size);
 
   double d_cat_closest = MAX;
   double d_cheese_closest = MAX;
@@ -535,7 +530,7 @@ void evaluateFeatures(double gr[max_graph_size][4],double features[25], int mous
 
   features[0] = 1 / (d_cheese_closest + 1);
   features[1] = - 1 / (d_cat_closest + 1);
-  // if (num_of_walls == 3 && numberOfCheese == 1) {
+  // if (num_of_walls == 3 && num_of_cheeses == 1) {
   //   features[2] = size_X;
   // } else if (num_of_walls == 3) {
   //   features[2] = size_X / 3;
