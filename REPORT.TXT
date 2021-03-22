@@ -10,17 +10,17 @@ mark.
 
 ________________________________________________
 
-Student Name 1 (last, first):
+Student Name 1 (last, first): Chen, Xin Yi 
 
-Student Name 2 (last, first):
+Student Name 2 (last, first): Karki, Anand
 
-Student number 1:
+Student number 1: 1004705018
 
-Student number 2:
+Student number 2: 1005383531
 
-UTORid 1:
+UTORid 1: chenx425
 
-UTORid 2:
+UTORid 2: karkiana
 
 READ THIS AND SIGN YOUR NAME AT THE END:
 
@@ -28,7 +28,7 @@ READ THIS AND SIGN YOUR NAME AT THE END:
 honesty and plaguarism. All work submitted as part
 of this assignment is my own.
 
-	Signed: _(student 1 name here)__	_(student 2 name here)__
+	Signed: _Xin Yi Chen__	_Anand Karki__
 
 
 (-5 marks for failing to provide the identifying
@@ -53,58 +53,80 @@ but explain carefully when needed.
      (1 mark) # Experiment 1, 10000 training trials, 20 rounds, random seed 1522,
      # 8x8 grid, cat-smartness .9
 
-     Initial mouse winning rate (first rate obtained when training starts):
+     Initial mouse winning rate (first rate obtained when training starts): -> 0.062414
 
      Train your mouse, and once trained, run the evaluation and  
-     record the mouse winning rate:
+     record the mouse winning rate: -> 0.865252
 
      >>> ./QLearn 1522 1 1 1 0.9 0 50 1000000
 
      (1 mark) # Experiment 2, 1000000 training trials, 50 rounds, random seed 1522,
      # 8x8 grid, cat-smartness .9
 
-     Initial mouse winning rate (first rate obtained when training starts):
+     Initial mouse winning rate (first rate obtained when training starts): -> 0.065167
 
      Train your mouse, and once trained, run the evaluation and  
-     record the mouse winning rate:
+     record the mouse winning rate: -> 0.952998
 
      (1 mark) Would the mouse keep improving and become invincible if
      you ran, say, 100,000,000 training rounds per batch?     
+
+     -> No, even with 100,000,000 training rounds per batch there can be state, action pairs in
+     the QTable that have not been explored which could turn out to be useful, especially since 
+     the cat can sometimes act randomly.
 
 4 .- Using the QTable saved from Experiment 2 (NO re-training!)
 
      (1 mark) # Experiment 3 - Run the evaluation on the 8x8 grid, cat-smartness=.9,
      # but using the random seed 4289 for the game.
 	
-     Mouse Winning Rate:
+     Mouse Winning Rate: -> 0.366027
 
      (2 mark) # Experiment 4 - Run the evaluation on the 8x8 grid, cat-smartness=.9,
      # but using the random seed 31415 for the game.
 	
-     Mouse Winning Rate:
+     Mouse Winning Rate: -> 0.524846    
 
-     Average rate for Experiement 3 and Experiment 4:
+     Average rate for Experiement 3 and Experiment 4: -> 0.4454365
 
      (1 mark) Compare with the rate obtained in experiment 2. What is happening here?
+
+     -> The success rate is significantly lower, this is because the Q-table we are using is for a 
+     different maze, thus the relatively optimal actions for states are not taking into account
+     where different walls are. They are also imagining walls where there are none.
 
 5 .- Understanding the effects of state space on learning ability:
 
      (1 mark) # Experiment 5 - Train your mouse on the 16x16 grid, using random seed
      # 1522, 1000000 trials, and 50 training rounds. Cat-smartness=.9
 
-     Initial mouse winning rate (first rate obtained when training starts):
+     >>> ./QLearn 1522 1 1 2 0.9 0 50 1000000
 
-     Mouse Winning Rate (from evaluation after training):
+     Initial mouse winning rate (first rate obtained when training starts): -> 0.029445
+
+     Mouse Winning Rate (from evaluation after training): -> 0.794504
 
      (1 mark) Compare the final winning rate with that from Experiment 2, what can
      you say about the difference in winning rates?
 
+     -> The success rate is lower, this is because the state space is much larger and the state, actions pairs
+     haven't been itreated over enough times for the Q-table to be accurate and thus result in a policy that is 
+     close to the optimal one.
+
 6 .- (2 marks) Is standard Q-Learning a rasonable strategy for environments
      that change constantly? discuss based on the above
+
+     -> It is not. Standard Q-learning learns too much specifics about the environment
+     where it was trained and thus when the environment changes, it can't react accoridnly 
+     because it isn't taking new information into account and it has learned irrelevant 
+     details. From Experiement #2 to Experiement #3 and #4, our success rate dropped nearly
+     50%, this goes to show that standard Q-learning is not effective for changing environments.
 
 7 .- (3 marks) Explain your feature set for feature-based Q Learning, and
                explain why and how each feature is expected to contribute
 	       to helping your mouse win
+
+     -> 
 
 8 .- Carry out the following experiments:
 
@@ -112,30 +134,40 @@ but explain carefully when needed.
      # the 16x16 grid, one cat, and one cheese, cat-smartness=.9,  
      # random seed = 1522, and use 1000000 trials and 50 rounds. 
 
-     Initial mouse winning rate (first rate obtained when training starts):
+     >>>>> ./QLearn 1522 1 1 2 0.9 3 50 1000000
+
+     Initial mouse winning rate (first rate obtained when training starts): -> 0.033543
      
-     Mouse Winning Rate (from evaluation after training):
+     Mouse Winning Rate (from evaluation after training): -> 0.866696
 
      Compare this rate against the rate obtained in Experiment #5, what
      are your conclusions regarding the utility of feature-based
      Q-Learning?
 
+     -> The success rate is feature-based Q-Learning is higher, and given that the state space
+     between this Experiement and Experiement #5 is the same, it means that feature-based
+     Q-Learning is much better at handling large state spaces, this is because it doesn't 
+     memorize state-action pairs.
+
      (1 mark) # Experiment 7, using the saved weights from Experiment 6 (no
      # re-training) run the evaluation using random seed 4289, same
      # 1 cheese, 1 cat, and cat-smartness=.9, 16x16 grid
 
-     Mouse Winning Rate (from evaluation after training):
+     Mouse Winning Rate (from evaluation after training): -> 0.836873
 
      (1 mark) # Experiment 8, using the saved weights from Experiment 6 (no
      # re-training) run the evaluation using random seed 31415, same
      # 1 cheese, 1 cat, and cat-smartness=.9, 16x16 grid
 
-     Mouse Winning Rate (from evaluation after training):
+     Mouse Winning Rate (from evaluation after training): -> 0.874815
 
      (1 mark) Comparing the winning rates from Experiments #7 and #8 against
      those from Experiment #6, what can you conclude about feature-
      based Q-Learning in terms of its ability to deal with changes 
      to the environment?
+
+     -> The success rates of the 3 experiments are quite similar, this means that feature-
+     based Q-Learning can handle changes in environment well.
      
 9 .- Carry out the following experiments:
 
@@ -143,31 +175,46 @@ but explain carefully when needed.
      # the 16x16 grid, 2 cats, and 3 cheeses, cat-smartness=.9,  
      # random seed = 1522, and use 1000000 trials and 50 rounds. 
 
-     Initial mouse winning rate (first rate obtained when training starts):
+     >>>>> ./QLearn 1522 2 3 2 0.9 3 50 1000000
+
+     Initial mouse winning rate (first rate obtained when training starts): -> 
      
-     Mouse Winning Rate (from evaluation after training):
+     Mouse Winning Rate (from evaluation after training): -> 0.856701
   
      (1 mark) # Experiment 9: Using the trained weights from Experiment 9, (no
      # re-training), run the evaluation on the 16x16 grid, 2 cats, 
      # 3 cheeses, cat-smartness=.9, and random seed 4289
      
-     Mouse Winning Rate (from evaluation after training):
+     Mouse Winning Rate (from evaluation after training): -> 0.819965
 
      (1 mark) # Experiment 9: Using the trained weights from Experiment 9, (no
      # re-training), run the evaluation on the 32x32 grid, 2 cats, 
      # 3 cheeses, cat-smartness=.9, and random seed 4289
      
-     Mouse Winning Rate (from evaluation after training):
+     Mouse Winning Rate (from evaluation after training): -> 0.859851
 
      (2 marks) Based on the last 3 experiments, what can you conclude regarding
      the usefulness and applicability of standard Q-Learning vs. 
      feature-based Q-learning?
+
+     -> The last three experiments have a similar success rate, this means that 
+     feature-based Q-learning can handle different environment and different sizes
+     of states spaces well. Again, this is because the algorithm learns general 
+     situations, instead of learning the excat state-action pairs, which allows 
+     feature-based Q-learning to perform well in different situations it hasn't 
+     encountered before
 
 10 . - (2 marks) We obviously can not train an expensive robot by trial and error,
       How would you implement feature-based Q-learning for a mobile bot so you
       can take advantage of reinforcement learning but not spend millions on
       broken robots that keep falling down the stairs?
       
+      -> Much like how we don't use actual cats and cheese to teach real mice to how to avoid
+      getting eaten, while still eating, we can create a simulator that mimicks the real world 
+      environment. We can identify key features of climbing stairs, such as the height of each stair,
+      the width, the slipperiness and we can use feature-based Q-learning to teach the bot's computer
+      how to climb the stairs. The cost of building a simulator is high as you have to have it realistic, 
+      but its still cheaper then repeatedly making new bots.
       
 _____________________________________________________
 
@@ -177,24 +224,24 @@ doesn't work, or what problems exist.
 	
 			Complete/Working	Partial		Not done
 
-QLearn 
+QLearn              x
  update
 
-Reward
+Reward              x
  function
 
-Decide
+Decide              x
  action
 
-featureEval
+featureEval         x
 
-evaluateQsa
+evaluateQsa         x
 
-maxQsa_prime
+maxQsa_prime        x
 
-Qlearn_features
+Qlearn_features     x
 
-decideAction_features
+decideAction_features x 
 
 _____________________________________________________
 
