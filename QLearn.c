@@ -335,8 +335,8 @@ double QLearn_reward(double gr[max_graph_size][4], int mouse_pos[1][2], int cats
   double distances_bw_mouse_cats[5] = {-1, -1, -1, -1, -1};
   double distances_bw_mouse_cheeses[5] = {-1, -1, -1, -1, -1};
 
-  BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, 1, size_X, size_X, graph_size);
-  BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, 1, size_X, size_X, graph_size);
+  BFS(gr, mouse_pos, cats, distances_bw_mouse_cats, 1, graph_size + 1, size_X, graph_size);
+  BFS(gr, mouse_pos, cheeses, distances_bw_mouse_cheeses, 1, graph_size + 1, size_X, graph_size);
 
   double d_cat = distances_bw_mouse_cats[0];
   double d_cheese = distances_bw_mouse_cheeses[0];
@@ -362,7 +362,6 @@ double QLearn_reward(double gr[max_graph_size][4], int mouse_pos[1][2], int cats
     }
 
     // computer number of walls around mouse
-    int mouse_index = cooridinates_to_index(mouse_pos[0][0], mouse_pos[0][1], size_X);
     int num_of_walls = count_wall(gr, mouse_pos[0], size_X);
 
     // only has one way out
@@ -546,7 +545,7 @@ void evaluateFeatures(double gr[max_graph_size][4],double features[25], int mous
   //   features[2] = size_X / (num_of_walls + 1);
   // }
 
-  features[2] = d_cat_average;
+  // features[2] = d_cat_average / graph_size;
 }
 
 double Qsa(double weights[25], double features[25])
